@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>情感智析云平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+</head>
+<body>
+
+<!-- Neural network background canvas -->
+<canvas id="neural-canvas"></canvas>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<div id="app">
+
+  <!-- ── NAVIGATION ── -->
+  <nav id="nav">
+    <div class="nav-brand" onclick="navigate('home')">
+      <div class="nav-logo">XS</div>
+      <div>
+        <div class="nav-title">XSYU AI platform</div>
+        <div class="nav-subtitle">Sentiment Analysis Platform</div>
+      </div>
+    </div>
+
+    <div class="nav-links" id="nav-links">
+      <button class="nav-link active" data-page="home"        onclick="navigate('home')">        <span class="nav-icon">🏠</span>首页</button>
+      <button class="nav-link" data-page="analysis"   onclick="navigate('analysis')">   <span class="nav-icon">🧪</span>分析实验室</button>
+      <button class="nav-link" data-page="results"    onclick="navigate('results')">    <span class="nav-icon">📊</span>分析结果</button>
+      <button class="nav-link" data-page="batch"      onclick="navigate('batch')">      <span class="nav-icon">📦</span>批量分析</button>
+      <button class="nav-link" data-page="stream"     onclick="navigate('stream')">     <span class="nav-icon">⚡</span>实时流分析</button>
+      <button class="nav-link" data-page="compare"    onclick="navigate('compare')">    <span class="nav-icon">⚖️</span>模型对比</button>
+      <button class="nav-link" data-page="metrics"    onclick="navigate('metrics')">    <span class="nav-icon">📈</span>性能指标</button>
+      <button class="nav-link" data-page="history"    onclick="navigate('history')">    <span class="nav-icon">🕐</span>历史记录</button>
+      <button class="nav-link" data-page="viz"        onclick="navigate('viz')">        <span class="nav-icon">🎨</span>数据可视化</button>
+      <button class="nav-link" data-page="dataset"    onclick="navigate('dataset')">    <span class="nav-icon">🗄️</span>数据集</button>
+      <button class="nav-link" data-page="api"        onclick="navigate('api')">        <span class="nav-icon">🔌</span>API 文档</button>
+      <button class="nav-link" data-page="training"   onclick="navigate('training')">   <span class="nav-icon">🔬</span>训练监控</button>
+      <button class="nav-link" data-page="settings"   onclick="navigate('settings')">   <span class="nav-icon">⚙️</span>系统配置</button>
+      <button class="nav-link" data-page="about"      onclick="navigate('about')">      <span class="nav-icon">💡</span>关于系统</button>
+    </div>
+
+    <div class="nav-actions">
+      <div class="nav-status"><div class="status-dot"></div>系统在线</div>
+    </div>
+  </nav>
+
+  <!-- ── PAGES ── -->
+  <div id="pages">
+
+    <!-- ============================================================
+         PAGE 1: HOME
+         ============================================================ -->
+    <div class="page active" id="page-home">
+      <section class="home-hero">
+        <div class="hero-chips">
+          <span class="hero-chip"><span class="hero-chip-dot" style="background:#06ffa5"></span>LSTM</span>
+          <span class="hero-chip"><span class="hero-chip-dot" style="background:#00d4ff"></span>BiLSTM + Attention</span>
+          <span class="hero-chip"><span class="hero-chip-dot" style="background:#7c3aed"></span>BiGRU + Self-Attention</span>
+          <span class="hero-chip"><span class="hero-chip-dot" style="background:#ff6b35"></span>BERT</span>
+          <span class="hero-chip"><span class="hero-chip-dot" style="background:#a78bfa"></span>三分类模型</span>
+        </div>
+
+        <div class="page-badge">🤖 深度学习 · 情感智能</div>
+
+        <h1 class="hero-title">
+          <span class="grad" style="font-size:2rem;">Deep Learning-Based Fine-Grained Emotion Recognition System</span><br/>
+          基于深度学习的细粒度情绪识别系统
+        </h1>
+
+        <p class="hero-sub">
+          基于多种深度学习架构，精准识别文本中的 <strong style="color:#06ffa5">正面</strong>、
+          <strong style="color:#a78bfa">中性</strong>、<strong style="color:#ff2d55">负面</strong>
+          三种情感倾向，助力智能决策
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn btn-analyze" onclick="navigate('analysis')">
+            🚀 开始分析
+          </button>
+          <button class="btn btn-outline btn-lg" onclick="navigate('compare')">
+            ⚖️ 模型对比
+          </button>
+          <button class="btn btn-ghost btn-lg" onclick="navigate('about')">
+            📖 了解更多
+          </button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-num" id="stat-accuracy">94.7%</div>
+            <div class="hero-stat-label">最高准确率</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">5</div>
+            <div class="hero-stat-label">模型架构</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">200K+</div>
+            <div class="hero-stat-label">训练样本</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">3</div>
+            <div class="hero-stat-label">情感类别</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">&lt;50ms</div>
+            <div class="hero-stat-label">推理延迟</div>
+          </div>
+        </div>
+
+        <div class="hero-scroll-hint">↓ 向下探索</div>
+      </section>
+
+      <section class="feature-grid">
+        <div class="feature-card" onclick="navigate('analysis')">
+          <div class="feature-icon">🧪</div>
+          <div class="feature-title">智能情感分析</div>
+          <div class="feature-desc">输入任意中文文本，毫秒级精准识别情感倾向，支持长文本分段分析</div>
+          <div class="feature-arrow">→</div>
+        </div>
+        <div class="feature-card" onclick="navigate('compare')">
+          <div class="feature-icon">⚖️</div>
+          <div class="feature-title">多模型对比</div>
+          <div class="feature-desc">横向对比 LSTM、BiLSTM、BiGRU、BERT 等模型的性能表现</div>
+          <div class="feature-arrow">→</div>
+        </div>
+        <div class="feature-card" onclick="navigate('batch')">
+          <div class="feature-icon">📦</div>
+          <div class="feature-title">批量数据处理</div>
+          <div class="feature-desc">支持 CSV/TXT 文件批量导入，一键分析数千条评论数据</div>
+          <div class="feature-arrow">→</div>
+        </div>
+        <div class="feature-card" onclick="navigate('stream')">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">实时流分析</div>
+          <div class="feature-desc">模拟实时数据流，动态展示情感变化趋势与分布</div>
+          <div class="feature-arrow">→</div>
+        </div>
+        <div class="feature-card" onclick="navigate('viz')">
+          <div class="feature-icon">🎨</div>
+          <div class="feature-title">可视化中心</div>
+          <div class="feature-desc">丰富的图表展示，词云、热力图、时序分析，一站式洞察</div>
+          <div class="feature-arrow">→</div>
+        </div>
+        <div class="feature-card" onclick="navigate('api')">
+          <div class="feature-icon">🔌</div>
+          <div class="feature-title">开放 API 接口</div>
+          <div class="feature-desc">完整的 RESTful API 文档，轻松集成到您的应用程序中</div>
+          <div class="feature-arrow">→</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============================================================
+         PAGE 2: ANALYSIS LAB
+         ============================================================ -->
+    <div class="page" id="page-analysis">
+      <div class="page-inner">
+        <div class="page-badge">🧪 情感分析实验室</div>
+        <h2 class="section-title">文本情感分析</h2>
+        <p class="section-sub">输入中文文本，选择分析模型，获取详细情感倾向报告</p>
+
+        <div class="analysis-layout">
+          <div class="analysis-main">
+            <div class="card card-lg">
+              <div class="card-header">
+                <div class="card-title">
+                  <div class="icon icon-blue">✍️</div>
+                  输入分析文本
+                </div>
+                <div class="flex gap-8">
+                  <button class="btn btn-ghost btn-sm" onclick="clearInput()">🗑 清空</button>
+                  <button class="btn btn-ghost btn-sm" onclick="pasteClipboard()">📋 粘贴</button>
+                </div>
+              </div>
+
+              <div class="text-input-wrap">
+                <textarea class="text-input-area" id="main-input" maxlength="2000"
+                  placeholder="在此输入需要分析的中文文本...&#10;&#10;例如：这款产品质量非常好，物流也很快，推荐购买！"
+                  oninput="updateCharCount(this)"></textarea>
+                <div class="text-input-footer">
+                  <span class="char-counter" id="char-counter">0 / 2000 字符</span>
+                  <div class="flex gap-8">
+                    <button class="btn btn-ghost btn-sm" onclick="loadExample()">💡 示例</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-16">
+                <div class="input-label">选择分析模型</div>
+                <div class="model-row" id="model-row">
+                  <div class="model-chip selected" data-model="bilstm-attention" onclick="selectModel(this)">
+                    <span>BiLSTM-Attn</span>
+                    <span class="model-chip-badge">推荐</span>
+                  </div>
+                  <div class="model-chip" data-model="lstm" onclick="selectModel(this)">LSTM</div>
+                  <div class="model-chip" data-model="bilstm-self-attention" onclick="selectModel(this)">BiLSTM-SA</div>
+                  <div class="model-chip" data-model="bigru-self-attention" onclick="selectModel(this)">BiGRU-SA</div>
+                  <div class="model-chip" data-model="bert" onclick="selectModel(this)">
+                    <span>BERT</span>
+                    <span class="model-chip-badge" style="background:rgba(255,107,53,0.15);color:#ff6b35">重型</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-24 flex gap-12 flex-wrap items-center">
+                <button class="btn btn-analyze" id="analyze-btn" onclick="startAnalysis()">
+                  🔍 开始分析
+                </button>
+                <button class="btn btn-ghost" onclick="navigate('batch')">📦 批量分析</button>
+                <span class="text-sm text-muted" style="margin-left:auto">⌨️ Ctrl+Enter 快速分析</span>
+              </div>
+            </div>
+
+            <!-- Loading state -->
+            <div class="card mt-24 hidden" id="analysis-loading-card">
+              <div class="analysis-loading">
+                <div class="neural-loader">
+                  <div class="nl-ring nl-ring-1"></div>
+                  <div class="nl-ring nl-ring-2"></div>
+                  <div class="nl-ring nl-ring-3"></div>
+                  <div class="nl-core"></div>
+                </div>
+                <div class="loading-text typing-cursor" id="loading-text">正在推理分析</div>
+                <div class="loading-steps">
+                  <div class="loading-step" id="ls-1"><div class="step-indicator active" id="si-1">1</div>文本预处理与分词</div>
+                  <div class="loading-step" id="ls-2"><div class="step-indicator" id="si-2">2</div>词向量嵌入编码</div>
+                  <div class="loading-step" id="ls-3"><div class="step-indicator" id="si-3">3</div>神经网络前向传播</div>
+                  <div class="loading-step" id="ls-4"><div class="step-indicator" id="si-4">4</div>Softmax 概率输出</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Panel -->
+          <div class="analysis-panel">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><div class="icon icon-green">💡</div>快速示例</div>
+              </div>
+              <div class="quick-examples">
+                <div class="example-item" onclick="setExample(this)">
+                  <span class="example-tag tag tag-green">正面</span>
+                  这家餐厅的菜品味道极佳，服务周到热情，环境也非常优雅，下次还会再来！
+                </div>
+                <div class="example-item" onclick="setExample(this)">
+                  <span class="example-tag tag">中性</span>
+                  今天天气一般，出门买了些日用品，下午在家休息，没有特别的事情发生。
+                </div>
+                <div class="example-item" onclick="setExample(this)">
+                  <span class="example-tag tag tag-red">负面</span>
+                  这次购物体验太差了，质量低劣，客服态度恶劣，完全是浪费钱！
+                </div>
+                <div class="example-item" onclick="setExample(this)">
+                  <span class="example-tag tag tag-green">正面</span>
+                  今天收到新手机，外观设计精美，系统流畅，拍照效果令人惊艳，非常满意。
+                </div>
+                <div class="example-item" onclick="setExample(this)">
+                  <span class="example-tag tag tag-red">负面</span>
+                  等了半小时外卖才到，食物已经完全冷透，包装也很简陋，非常失望。
+                </div>
+              </div>
+            </div>
+
+            <div class="card mt-16">
+              <div class="card-header">
+                <div class="card-title"><div class="icon icon-blue">⚙️</div>分析配置</div>
+              </div>
+              <div class="input-group">
+                <label class="input-label">置信度阈值</label>
+                <div class="range-wrap">
+                  <input type="range" class="range-field" min="50" max="99" value="70" id="conf-threshold"
+                    oninput="document.getElementById('conf-val').textContent=this.value+'%'" />
+                  <span class="range-val" id="conf-val">70%</span>
+                </div>
+              </div>
+              <div class="switch-wrap">
+                <div class="switch-info">
+                  <div class="switch-label">关键词高亮</div>
+                  <div class="switch-desc">在结果中标注情感关键词</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" checked id="sw-highlight">
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+              <div class="switch-wrap">
+                <div class="switch-info">
+                  <div class="switch-label">详细分析报告</div>
+                  <div class="switch-desc">生成完整的特征分析说明</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" checked id="sw-detail">
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="card mt-16">
+              <div class="card-header">
+                <div class="card-title"><div class="icon icon-purple">📊</div>本次统计</div>
+              </div>
+              <div class="grid-2 grid gap-12">
+                <div style="text-align:center">
+                  <div class="stat-value grad-blue" id="session-count" style="font-size:28px">0</div>
+                  <div class="stat-label">分析次数</div>
+                </div>
+                <div style="text-align:center">
+                  <div class="stat-value grad-green" id="session-avg" style="font-size:28px">—</div>
+                  <div class="stat-label">平均置信度</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE 3: RESULTS
+         ============================================================ -->
+    <div class="page" id="page-results">
+      <div class="page-inner">
+        <div class="page-badge">📊 分析结果</div>
+        <div class="flex justify-between items-center mb-24">
+          <div>
+            <h2 class="section-title">情感分析报告</h2>
+            <p class="section-sub text-muted" id="result-model-info">模型：BiLSTM-Attention · 耗时 12ms</p>
+          </div>
+          <div class="flex gap-12">
+            <button class="btn btn-outline btn-sm" onclick="navigate('analysis')">← 重新分析</button>
+            <!-- <button class="btn btn-ghost btn-sm" onclick="navigate('report')">📋 生成报告</button> -->
+          </div>
+        </div>
+
+        <div class="result-hero">
+          <div class="result-main-badge" id="result-badge-wrap">
+            <div class="result-badge-inner">
+              <div class="result-emoji" id="result-emoji">😊</div>
+              <div class="result-label" id="result-label" style="color:#06ffa5">正面情感</div>
+              <div class="result-confidence" id="result-conf">置信度 92.3%</div>
+            </div>
+          </div>
+          <div class="result-score" id="result-score">92.3</div>
+          <div style="font-size:14px;color:var(--text-muted);margin-top:8px">综合置信度分数</div>
+        </div>
+
+        <div class="grid grid-4 gap-16 mb-24" id="result-stats-row">
+          <div class="stat-card blue">
+            <div class="stat-label">正面概率</div>
+            <div class="stat-value grad-green" id="rs-pos">92.3%</div>
+            <div class="stat-icon">😊</div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-label">中性概率</div>
+            <div class="stat-value grad-purple" id="rs-neu">5.1%</div>
+            <div class="stat-icon">😐</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-label">负面概率</div>
+            <div class="stat-value grad-orange" id="rs-neg">2.6%</div>
+            <div class="stat-icon">😞</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">推理延迟</div>
+            <div class="stat-value grad-blue" id="rs-time">12ms</div>
+            <div class="stat-icon">⚡</div>
+          </div>
+        </div>
+
+        <div class="result-detail-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="icon icon-blue">📊</div>概率分布</div></div>
+            <div class="progress-wrap">
+              <div class="progress-head"><span class="progress-name">😊 正面 (Positive)</span><span class="progress-val" id="bar-pos">92.3%</span></div>
+              <div class="progress-bar"><div class="progress-fill fill-pos" id="fill-pos" style="width:92.3%"></div></div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-head"><span class="progress-name">😐 中性 (Neutral)</span><span class="progress-val" id="bar-neu">5.1%</span></div>
+              <div class="progress-bar"><div class="progress-fill fill-neu" id="fill-neu" style="width:5.1%"></div></div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-head"><span class="progress-name">😞 负面 (Negative)</span><span class="progress-val" id="bar-neg">2.6%</span></div>
+              <div class="progress-bar"><div class="progress-fill fill-neg" id="fill-neg" style="width:2.6%"></div></div>
+            </div>
+            <div class="chart-wrap" style="height:200px;margin-top:12px">
+              <canvas id="result-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="icon icon-green">🔍</div>分析文本</div></div>
+            <div style="font-size:14px;line-height:1.9;color:var(--text-secondary);padding:8px 0" id="analyzed-text">
+              这家餐厅的菜品味道<span style="background:rgba(6,255,165,0.2);color:#06ffa5;border-radius:3px;padding:1px 4px">极佳</span>，
+              服务<span style="background:rgba(6,255,165,0.2);color:#06ffa5;border-radius:3px;padding:1px 4px">周到热情</span>，
+              环境也非常<span style="background:rgba(6,255,165,0.2);color:#06ffa5;border-radius:3px;padding:1px 4px">优雅</span>，
+              下次<span style="background:rgba(6,255,165,0.2);color:#06ffa5;border-radius:3px;padding:1px 4px">还会再来</span>！
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card-title mb-8"><div class="icon icon-purple">🏷️</div>情感关键词</div>
+            <div class="keyword-cloud" id="keyword-cloud">
+              <span class="keyword-pill" style="background:rgba(6,255,165,0.1);color:#06ffa5;border-color:rgba(6,255,165,0.3)">极佳 +0.82</span>
+              <span class="keyword-pill" style="background:rgba(6,255,165,0.1);color:#06ffa5;border-color:rgba(6,255,165,0.3)">周到热情 +0.76</span>
+              <span class="keyword-pill" style="background:rgba(6,255,165,0.1);color:#06ffa5;border-color:rgba(6,255,165,0.3)">优雅 +0.61</span>
+              <span class="keyword-pill" style="background:rgba(6,255,165,0.1);color:#06ffa5;border-color:rgba(6,255,165,0.3)">再来 +0.54</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="icon icon-orange">🔢</div>推理过程</div></div>
+            <div class="analysis-process">
+              <div class="process-step"><div class="process-step-num">1</div>文本 Tokenize → 367 tokens</div>
+              <div class="process-step"><div class="process-step-num">2</div>词向量嵌入 → [128维向量]</div>
+              <div class="process-step"><div class="process-step-num">3</div>BiLSTM 编码 → [256维]</div>
+              <div class="process-step"><div class="process-step-num">4</div>Attention 加权 → 关键位置聚焦</div>
+              <div class="process-step"><div class="process-step-num">5</div>Softmax → [0.923, 0.051, 0.026]</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="icon icon-red">📋</div>模型信息</div></div>
+            <div class="data-sample">
+              <div class="data-sample-row">
+                <div class="data-sample-text" style="color:var(--text-muted)">模型</div>
+                <div style="font-size:13px;font-weight:600;color:var(--accent-primary)">BiLSTM-Attention</div>
+              </div>
+              <div class="data-sample-row">
+                <div class="data-sample-text" style="color:var(--text-muted)">词表大小</div>
+                <div style="font-size:13px;font-family:var(--font-mono)">50,000</div>
+              </div>
+              <div class="data-sample-row">
+                <div class="data-sample-text" style="color:var(--text-muted)">嵌入维度</div>
+                <div style="font-size:13px;font-family:var(--font-mono)">128</div>
+              </div>
+              <div class="data-sample-row">
+                <div class="data-sample-text" style="color:var(--text-muted)">隐藏层</div>
+                <div style="font-size:13px;font-family:var(--font-mono)">256 × 2</div>
+              </div>
+              <div class="data-sample-row">
+                <div class="data-sample-text" style="color:var(--text-muted)">验证集准确率</div>
+                <div style="font-size:13px;font-weight:700;color:var(--accent-tertiary)">92.8%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE 4: BATCH ANALYSIS
+         ============================================================ -->
+    <div class="page" id="page-batch">
+      <div class="page-inner">
+        <div class="page-badge">📦 批量分析</div>
+        <h2 class="section-title">批量文本分析</h2>
+        <p class="section-sub">上传数据文件或粘贴多行文本，一键完成批量情感分析</p>
+
+        <div class="grid grid-2 gap-20 mb-24">
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()"
+            ondragover="event.preventDefault();this.classList.add('drag-over')"
+            ondragleave="this.classList.remove('drag-over')"
+            ondrop="handleDrop(event)">
+            <input type="file" id="file-input" accept=".csv,.txt,.tsv" hidden onchange="handleFileSelect(event)" />
+            <div class="upload-icon">📂</div>
+            <div class="upload-title">拖拽文件到此处</div>
+            <div class="upload-sub">或点击选择文件</div>
+            <div class="upload-formats">
+              <span class="tag">CSV</span>
+              <span class="tag">TXT</span>
+              <span class="tag">TSV</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><div class="icon icon-blue">📝</div>手动输入（每行一条）</div>
+            </div>
+            <textarea class="input-field" style="height:160px" id="batch-input"
+              placeholder="这款产品非常好用，强烈推荐！&#10;服务太差了，完全不满意。&#10;今天天气还行，没什么特别的。&#10;..."></textarea>
+            <div class="flex justify-between items-center mt-12">
+              <span class="text-xs text-muted" id="batch-count">0 行</span>
+              <button class="btn btn-primary btn-sm" onclick="startBatchAnalysis()">🚀 开始批量分析</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card hidden" id="batch-progress-card">
+          <div class="card-header">
+            <div class="card-title"><div class="icon icon-green">⚙️</div>批量处理进度</div>
+            <button class="btn btn-ghost btn-sm" onclick="stopBatch()">⏹ 停止</button>
+          </div>
+          <div class="epoch-progress">
+            <div class="flex justify-between mb-8">
+              <span class="text-sm text-secondary">处理进度</span>
+              <span class="text-sm" id="batch-progress-text">0 / 0</span>
+            </div>
+            <div class="epoch-bar"><div class="epoch-fill" id="batch-fill" style="width:0%"></div></div>
+          </div>
+          <div class="batch-stat-row">
+            <div class="batch-stat-item">
+              <div class="batch-stat-num grad-green" id="b-pos">0</div>
+              <div class="batch-stat-lbl">正面</div>
+            </div>
+            <div class="batch-stat-item">
+              <div class="batch-stat-num grad-purple" id="b-neu">0</div>
+              <div class="batch-stat-lbl">中性</div>
+            </div>
+            <div class="batch-stat-item">
+              <div class="batch-stat-num grad-orange" id="b-neg">0</div>
+              <div class="batch-stat-lbl">负面</div>
+            </div>
+            <div class="batch-stat-item">
+              <div class="batch-stat-num grad-blue" id="b-total">0</div>
+              <div class="batch-stat-lbl">总计</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-16 hidden" id="batch-results-card">
+          <div class="card-header">
+            <div class="card-title"><div class="icon icon-purple">📊</div>批量分析结果</div>
+            <div class="flex gap-8">
+              <button class="btn btn-outline btn-sm" onclick="exportBatch('csv')">⬇️ 导出 CSV</button>
+              <button class="btn btn-outline btn-sm" onclick="exportBatch('json')">⬇️ 导出 JSON</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table" id="batch-result-table">
+              <thead>
+                <tr>
+                  <th style="width:50px">#</th>
+                  <th>文本内容</th>
+                  <th style="width:100px">情感</th>
+                  <th style="width:100px">置信度</th>
+                  <th style="width:80px">模型</th>
+                </tr>
+              </thead>
+              <tbody id="batch-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE 5: REAL-TIME STREAM
+         ============================================================ -->
+    <div class="page" id="page-stream">
+      <div class="page-inner">
+        <div class="page-badge">⚡ 实时流分析</div>
+        <h2 class="section-title">实时情感流监控</h2>
+        <p class="section-sub">模拟实时数据流，动态监控情感变化趋势</p>
+
+        <div class="grid grid-4 gap-16 mb-24">
+          <div class="stat-card blue"><div class="stat-label">当前情感指数</div><div class="stat-value grad-blue" id="st-index">—</div><div class="stat-icon">📊</div></div>
+          <div class="stat-card green"><div class="stat-label">正面占比</div><div class="stat-value grad-green" id="st-pos-rate">—</div><div class="stat-icon">😊</div></div>
+          <div class="stat-card orange"><div class="stat-label">负面警报</div><div class="stat-value grad-orange" id="st-neg-alert">0</div><div class="stat-icon">⚠️</div></div>
+          <div class="stat-card purple"><div class="stat-label">已处理条数</div><div class="stat-value grad-purple" id="st-processed">0</div><div class="stat-icon">🔢</div></div>
+        </div>
+
+        <div class="stream-layout">
+          <div>
+            <div class="stream-controls flex gap-12 items-center mb-16 flex-wrap">
+              <button class="btn btn-primary" id="stream-btn" onclick="toggleStream()">▶ 开始实时流</button>
+              <button class="btn btn-ghost" onclick="clearStream()">🗑 清空</button>
+              <div class="stream-speed">
+                <span>速度</span>
+                <input type="range" class="speed-slider" min="1" max="10" value="5" id="speed-slider" />
+                <span id="speed-val">5x</span>
+              </div>
+              <div class="flex gap-8" style="margin-left:auto">
+                <span class="tag tag-green" id="stream-pos-tag">正面: 0</span>
+                <span class="tag tag-purple" id="stream-neu-tag">中性: 0</span>
+                <span class="tag tag-red" id="stream-neg-tag">负面: 0</span>
+              </div>
+            </div>
+            <div class="stream-feed" id="stream-feed">
+              <div style="text-align:center;padding:40px;color:var(--text-muted)">
+                <div style="font-size:32px;margin-bottom:12px">⚡</div>
+                点击"开始实时流"以启动模拟数据流
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="icon icon-blue">📈</div>情感动态曲线</div></div>
+              <div class="chart-wrap"><canvas id="stream-chart"></canvas></div>
+            </div>
+            <div class="card mt-16">
+              <div class="card-header"><div class="card-title"><div class="icon icon-green">🍩</div>情感分布</div></div>
+              <div class="chart-wrap"><canvas id="stream-pie"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE 6: MODEL COMPARISON
+         ============================================================ -->
+    <div class="page" id="page-compare">
+      <div class="page-inner">
+        <div class="page-badge">⚖️ 模型对比</div>
+        <h2 class="section-title">模型性能横向对比</h2>
+        <p class="section-sub">深入比较各深度学习模型在情感分析任务上的表现</p>
+
+        <div class="model-compare-grid" id="model-compare-grid">
+          <!-- Filled by JS -->
+        </div>
+
+        <div class="card mt-24">
+          <div class="card-header">
+            <div class="card-title"><div class="icon icon-blue">✍️</div>输入文本，多模型同时分析</div>
+          </div>
+          <div class="compare-selector-head">
+            <div class="input-label compare-selector-label">勾选参与对比的模型</div>
+            <div class="compare-selector-tools">
+              <div class="text-sm text-muted" id="compare-selected-count">已选择 0 个模型</div>
+              <button class="btn btn-ghost btn-sm" onclick="selectAllCompareModels()">全选</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearCompareModels()">清空</button>
+            </div>
+          </div>
+          <div class="compare-model-selector" id="compare-model-selector">
+            <label class="compare-model-option">
+              <input type="checkbox" class="compare-model-checkbox" value="lstm" onchange="toggleCompareModelSelection('lstm', this.checked)">
+              <span>LSTM</span>
+            </label>
+            <label class="compare-model-option">
+              <input type="checkbox" class="compare-model-checkbox" value="bilstm-attention" onchange="toggleCompareModelSelection('bilstm-attention', this.checked)">
+              <span>BiLSTM + Attention</span>
+            </label>
+            <label class="compare-model-option">
+              <input type="checkbox" class="compare-model-checkbox" value="bilstm-self-attention" onchange="toggleCompareModelSelection('bilstm-self-attention', this.checked)">
+              <span>BiLSTM + Self-Attention</span>
+            </label>
+            <label class="compare-model-option">
+              <input type="checkbox" class="compare-model-checkbox" value="bigru-self-attention" onchange="toggleCompareModelSelection('bigru-self-attention', this.checked)">
+              <span>BiGRU + Self-Attention</span>
+            </label>
+            <label class="compare-model-option">
+              <input type="checkbox" class="compare-model-checkbox" value="bert" onchange="toggleCompareModelSelection('bert', this.checked)">
+              <span>BERT</span>
+            </label>
+          </div>
+          <div class="text-sm text-muted" id="compare-model-hint">请至少选择 1 个模型进行对比</div>
+          <div class="compare-input-wrap">
+            <textarea
+              id="compare-input"
+              class="text-input-area compare-input-area"
+              maxlength="5000"
+              placeholder="请输入需要对比分析的文本，例如：这款产品外观精美，使用体验非常流畅，但物流有点慢。"
+            ></textarea>
+            <div class="compare-input-actions">
+              <div class="text-sm text-muted" id="compare-char-count">0 / 5000 字符</div>
+              <button class="btn btn-ghost btn-sm" onclick="loadCompareExample()">💡 示例</button>
+              <button class="btn btn-analyze" id="compare-analyze-btn" onclick="startCompareAnalysis()" disabled>⚖️ 开始模型对比</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-20">
+          <div class="card-header"><div class="card-title"><div class="icon icon-green">📋</div>多模型对比结果</div></div>
+          <div style="overflow-x:auto">
+            <table class="data-table" id="compare-result-table">
+              <thead>
+                <tr>
+                  <th>模型</th>
+                  <th>情感结论</th>
+                  <th>置信度</th>
+                  <th>正面</th>
+                  <th>中性</th>
+                  <th>负面</th>
+                  <th>耗时</th>
+                </tr>
+              </thead>
+              <tbody id="compare-result-tbody">
+                <tr>
+                  <td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px 12px">输入文本后点击“开始模型对比”查看结果</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE 7: PERFORMANCE METRICS
+         ============================================================ -->
+    <div class="page" id="page-metrics">
+      <div class="page-inner">
+        <div class="page-badge">📈 性能评估</div>
+        <h2 class="section-title">模型性能指标</h2>
+        <p class="section-sub">详细的评估报告，包含混淆矩阵、ROC 曲线及各类分类指标</p>
+
+        <div class="grid grid-4 gap-16 mb-24">
+          <div class="stat-card blue"><div class="stat-label">整体准确率</div><div class="stat-value grad-blue">92.8%</div><div class="stat-icon">🎯</div></div>
+          <div class="stat-card green"><div class="stat-label">宏平均 F1</div><div class="stat-value grad-green">91.5%</div><div class="stat-icon">📊</div></div>
+          <div class="stat-card purple"><div class="stat-label">宏平均精确率</div><div class="stat-value grad-purple">92.1%</div><div class="stat-icon">🔍</div></div>
+          <div class="stat-card orange"><div class="stat-label">宏平均召回率</div><div class="stat-value grad-orange">91.0%</div><div class="stat-icon">📡</div></div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab('metrics','confusion')">混淆矩阵</button>
+          <button class="tab-btn" onclick="switchTab('metrics','roc')">ROC 曲线</button>
+          <button class="tab-btn" onclick="switchTab('metrics','classreport')">分类报告</button>
+          <button class="tab-btn" onclick="switchTab('metrics','lossacc')">Loss/Acc 曲线</button>
+        </div>
+
+        <div class="tab-content active" id="metrics-confusion">
+          <div class="grid grid-2 gap-20 items-center">
+            <div>
+              <h3 style="font-size:15px;font-weight:700;margin-bottom:20px">混淆矩阵（归一化）</h3>
+              <div class="confusion-matrix" id="cm-wrap">
+                <!-- filled by js -->
+              </div>
+              <div class="info-box info mt-16">
+                <div class="info-box-icon">💡</div>
+                <div class="info-box-text">对角线表示正确分类，数值越高（颜色越深）越好；非对角线为误分类情况</div>
+              </div>
+            </div>
+            <div>
+              <div class="chart-wrap"><canvas id="cm-chart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="metrics-roc">
+          <div class="chart-wrap" style="height:360px"><canvas id="roc-chart"></canvas></div>
+        </div>
+
+        <div class="tab-content" id="metrics-classreport">
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr><th>类别</th><th>精确率</th><th>召回率</th><th>F1-Score</th><th>支持数</th></tr></thead>
+              <tbody>
+                <tr><td><span class="tag tag-green">正面</span></td><td><span class="font-mono text-accent">0.945</span></td><td><span class="font-mono text-accent">0.938</span></td><td><span class="font-mono text-accent">0.941</span></td><td class="font-mono">8,421</td></tr>
+                <tr><td><span class="tag tag-purple">中性</span></td><td><span class="font-mono" style="color:#a78bfa">0.891</span></td><td><span class="font-mono" style="color:#a78bfa">0.876</span></td><td><span class="font-mono" style="color:#a78bfa">0.883</span></td><td class="font-mono">6,234</td></tr>
+                <tr><td><span class="tag tag-red">负面</span></td><td><span class="font-mono" style="color:#ff6b35">0.928</span></td><td><span class="font-mono" style="color:#ff6b35">0.916</span></td><td><span class="font-mono" style="color:#ff6b35">0.922</span></td><td class="font-mono">7,891</td></tr>
+                <tr style="font-weight:700"><td>宏平均</td><td class="font-mono">0.921</td><td class="font-mono">0.910</td><td class="font-mono">0.915</td><td class="font-mono">22,546</td></tr>
+                <tr style="font-weight:700"><td>加权平均</td><td class="font-mono">0.928</td><td class="font-mono">0.928</td><td class="font-mono">0.928</td><td class="font-mono">22,546</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="tab-content" id="metrics-lossacc">
+          <div class="grid grid-2 gap-20">
+            <div class="card">
+              <div class="card-header"><div class="card-title">训练 / 验证损失</div></div>
+              <div class="chart-wrap"><canvas id="loss-chart"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">训练 / 验证准确率</div></div>
+              <div class="chart-wrap"><canvas id="acc-chart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE 8: HISTORY
+         ============================================================ -->
+    <div class="page" id="page-history">
+      <div class="page-inner">
+        <div class="page-badge">🕐 历史记录</div>
+        <div class="flex justify-between items-center mb-24">
+          <div>
+            <h2 class="section-title">分析历史记录</h2>
+            <p class="section-sub">查询和管理所有历史分析记录</p>
+          </div>
+          <div class="flex gap-12">
+            <button class="btn btn-ghost btn-sm" onclick="clearHistory()">🗑 清空历史</button>
+            <button class="btn btn-outline btn-sm" onclick="exportHistory()">⬇️ 导出</button>
+          </div>
+        </div>
+
+        <div class="grid grid-4 gap-16 mb-20">
+          <div class="stat-card blue">  <div class="stat-label">总分析次数</div><div class="stat-value grad-blue"  id="h-total">0</div></div>
+          <div class="stat-card green"> <div class="stat-label">正面情感</div>  <div class="stat-value grad-green" id="h-pos">0</div></div>
+          <div class="stat-card purple"><div class="stat-label">中性情感</div>  <div class="stat-value grad-purple" id="h-neu">0</div></div>
+          <div class="stat-card orange"><div class="stat-label">负面情感</div>  <div class="stat-value grad-orange" id="h-neg">0</div></div>
+        </div>
+
+        <div class="flex gap-12 mb-20 items-center flex-wrap">
+          <input type="text" class="input-field" style="max-width:280px;padding:9px 14px" placeholder="🔍 搜索历史记录..." id="history-search" oninput="filterHistory()" />
+          <div class="history-filters">
+            <button class="filter-chip active" data-filter="all"      onclick="setFilter(this)">全部</button>
+            <button class="filter-chip" data-filter="positive" onclick="setFilter(this)">😊 正面</button>
+            <button class="filter-chip" data-filter="neutral"  onclick="setFilter(this)">😐 中性</button>
+            <button class="filter-chip" data-filter="negative" onclick="setFilter(this)">😞 负面</button>
+          </div>
+        </div>
+
+        <div id="history-list">
+          <div style="text-align:center;padding:60px;color:var(--text-muted)">
+            <div style="font-size:40px;margin-bottom:12px">🕐</div>
+            暂无历史记录，先去<a style="color:var(--accent-primary);cursor:pointer" onclick="navigate('analysis')">分析一条</a>吧！
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE 9: VISUALIZATION CENTER
+         ============================================================ -->
+    <div class="page" id="page-viz">
+      <div class="page-inner">
+        <div class="page-badge">🎨 数据可视化</div>
+        <h2 class="section-title">可视化分析中心</h2>
+        <p class="section-sub">多维度图表展示，深度洞察情感数据分布规律</p>
+
+        <div class="viz-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="icon icon-blue">🍩</div>情感分布饼图</div></div>
+            <div class="chart-wrap"><canvas id="viz-pie"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="icon icon-purple">📊</div>本月情感趋势</div></div>
+            <div class="chart-wrap"><canvas id="viz-trend"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="icon icon-green">📈</div>置信度分布</div></div>
+            <div class="chart-wrap"><canvas id="viz-conf"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="icon icon-orange">🌡️</div>情感热力图（按小时）</div></div>
+            <div class="chart-wrap"><canvas id="viz-heatmap"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card mt-20">
+          <div class="card-header"><div class="card-title"><div class="icon icon-blue">☁️</div>高频词云</div></div>
+          <div class="word-cloud-wrap" id="word-cloud" style="min-height:160px;padding:20px">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE 10: DATASET EXPLORER
+         ============================================================ -->
+    <div class="page" id="page-dataset">
+      <div class="page-inner">
+        <div class="page-badge">🗄️ 数据集探索</div>
+        <h2 class="section-title">训练数据集分析</h2>
+        <p class="section-sub">探索模型训练所使用的 ChnSentiCorp 中文情感数据集</p>
+
+        <div class="grid grid-4 gap-16 mb-24">
+          <div class="stat-card blue">  <div class="stat-label">训练集样本</div>  <div class="stat-value grad-blue">9,600</div></div>
+          <div class="stat-card green"> <div class="stat-label">验证集样本</div>  <div class="stat-value grad-green">1,200</div></div>
+          <div class="stat-card purple"><div class="stat-label">测试集样本</div>  <div class="stat-value grad-purple">1,200</div></div>
+          <div class="stat-card orange"><div class="stat-label">平均文本长度</div><div class="stat-value grad-orange">127</div></div>
+        </div>
+
+        <div class="dataset-overview">
+          <div>
+            <div class="card mb-20">
+              <div class="card-header">
+                <div class="card-title"><div class="icon icon-blue">📊</div>类别分布</div>
+                <div class="tabs" style="margin:0">
+                  <button class="tab-btn active" onclick="switchDsTab('train')">训练集</button>
+                  <button class="tab-btn" onclick="switchDsTab('valid')">验证集</button>
+                  <button class="tab-btn" onclick="switchDsTab('test')">测试集</button>
+                </div>
+              </div>
+              <div class="chart-wrap"><canvas id="ds-dist-chart"></canvas></div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><div class="icon icon-green">👁️</div>数据样本预览</div>
+                <button class="btn btn-ghost btn-sm" onclick="refreshSamples()">🔄 刷新</button>
+              </div>
+              <div class="data-sample" id="sample-list">
+                <!-- filled by js -->
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card mb-20">
+              <div class="card-header"><div class="card-title"><div class="icon icon-purple">📏</div>文本长度分布</div></div>
+              <div class="chart-wrap"><canvas id="ds-len-chart"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="icon icon-orange">🔤</div>数据集信息</div></div>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-time">数据集来源</div>
+                  <div class="timeline-title">ChnSentiCorp</div>
+                  <div class="timeline-content">中文酒店评论情感分析数据集，涵盖正/负向情感</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:#7c3aed"></div>
+                  <div class="timeline-time">扩展数据</div>
+                  <div class="timeline-title">自定义中性样本</div>
+                  <div class="timeline-content">手工标注中性情感样本，使任务升级为三分类</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:#06ffa5"></div>
+                  <div class="timeline-time">预处理</div>
+                  <div class="timeline-title">数据清洗 & Tokenize</div>
+                  <div class="timeline-content">去噪、分词、构建词表、向量嵌入</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE 11: API DOCS
+         ============================================================ -->
+    <div class="page" id="page-api">
+      <div class="page-inner">
+        <div class="page-badge">🔌 API 文档</div>
+        <h2 class="section-title">RESTful API 接口文档</h2>
+        <p class="section-sub">通过标准 HTTP 接口集成情感分析能力到您的应用</p>
+
+        <div class="info-box info mb-24">
+          <div class="info-box-icon">🌐</div>
+          <div class="info-box-text">
+            <strong>基础 URL：</strong><code style="font-family:var(--font-mono);color:var(--accent-primary)">http://localhost:8000/api/v1</code><br/>
+            所有请求需在 Header 中携带 <code style="font-family:var(--font-mono)">Content-Type: application/json</code>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/analyze</span>
+            <span class="endpoint-desc">对单条文本进行情感分析</span>
+            <span class="tag tag-green">稳定</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="tabs">
+              <button class="tab-btn active" onclick="switchTab('ep1','params')">参数说明</button>
+              <button class="tab-btn" onclick="switchTab('ep1','request')">请求示例</button>
+              <button class="tab-btn" onclick="switchTab('ep1','response')">响应示例</button>
+            </div>
+            <div class="tab-content active" id="ep1-params">
+              <table class="param-table w-full">
+                <thead><tr><th>参数名</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td class="font-mono">text</td><td><span class="param-type">string</span></td><td class="param-required">必填</td><td>待分析的文本，最长 2000 字符</td></tr>
+                  <tr><td class="font-mono">model</td><td><span class="param-type">string</span></td><td>可选</td><td>模型名称，默认 bilstm-attention</td></tr>
+                  <tr><td class="font-mono">return_keywords</td><td><span class="param-type">boolean</span></td><td>可选</td><td>是否返回关键词，默认 false</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tab-content" id="ep1-request">
+              <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+<span class="keyword">curl</span> -X <span class="attr">POST</span> <span class="string">"http://localhost:8000/api/v1/analyze"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{
+    "text": "这款产品质量非常好，强烈推荐！",
+    "model": "bilstm-attention",
+    "return_keywords": true
+  }'</span>
+              </div>
+            </div>
+            <div class="tab-content" id="ep1-response">
+              <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+{
+  <span class="attr">"status"</span>: <span class="string">"success"</span>,
+  <span class="attr">"sentiment"</span>: <span class="string">"positive"</span>,
+  <span class="attr">"label_cn"</span>: <span class="string">"正面"</span>,
+  <span class="attr">"confidence"</span>: <span class="number">0.923</span>,
+  <span class="attr">"probabilities"</span>: {
+    <span class="attr">"positive"</span>: <span class="number">0.923</span>,
+    <span class="attr">"neutral"</span>:  <span class="number">0.051</span>,
+    <span class="attr">"negative"</span>: <span class="number">0.026</span>
+  },
+  <span class="attr">"keywords"</span>: [<span class="string">"质量"</span>, <span class="string">"非常好"</span>, <span class="string">"推荐"</span>],
+  <span class="attr">"inference_time_ms"</span>: <span class="number">12</span>
+}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/analyze/batch</span>
+            <span class="endpoint-desc">批量情感分析（最多 1000 条）</span>
+            <span class="tag">批量</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode(this)">复制</button>
+{
+  <span class="attr">"texts"</span>: [<span class="string">"文本一"</span>, <span class="string">"文本二"</span>, <span class="string">"..."</span>],
+  <span class="attr">"model"</span>: <span class="string">"bilstm-attention"</span>
+}
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/models</span>
+            <span class="endpoint-desc">获取所有可用模型列表</span>
+            <span class="tag tag-green">稳定</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode(this)">复制</button>
+<span class="comment">// 响应示例</span>
+{
+  <span class="attr">"models"</span>: [
+    {<span class="attr">"id"</span>: <span class="string">"bilstm-attention"</span>, <span class="attr">"accuracy"</span>: <span class="number">0.928</span>, <span class="attr">"latency_ms"</span>: <span class="number">12</span>},
+    {<span class="attr">"id"</span>: <span class="string">"bert"</span>,              <span class="attr">"accuracy"</span>: <span class="number">0.947</span>, <span class="attr">"latency_ms"</span>: <span class="number">45</span>}
+  ]
+}
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/health</span>
+            <span class="endpoint-desc">系统健康检查</span>
+            <span class="tag tag-green">稳定</span>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method-badge method-delete">DELETE</span>
+            <span class="endpoint-path">/history</span>
+            <span class="endpoint-desc">清空分析历史记录</span>
+            <span class="tag tag-red">危险</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 报告中心页面已移除 -->
+
+    <!-- ============================================================
+         PAGE 13: TRAINING MONITOR
+         ============================================================ -->
+    <div class="page" id="page-training">
+      <div class="page-inner">
+        <div class="page-badge">🔬 训练监控</div>
+        <h2 class="section-title">模型训练监控台</h2>
+        <p class="section-sub">实时监控模型训练进度，追踪 Loss 与 Accuracy 变化</p>
+
+        <div class="grid grid-4 gap-16 mb-24">
+          <div class="stat-card blue">  <div class="stat-label">当前 Epoch</div>    <div class="stat-value grad-blue"   id="tr-epoch">—</div></div>
+          <div class="stat-card green"> <div class="stat-label">训练 Loss</div>     <div class="stat-value grad-green"  id="tr-loss">—</div></div>
+          <div class="stat-card purple"><div class="stat-label">验证 Accuracy</div> <div class="stat-value grad-purple" id="tr-acc">—</div></div>
+          <div class="stat-card orange"><div class="stat-label">剩余时间</div>      <div class="stat-value grad-orange" id="tr-eta">—</div></div>
+        </div>
+
+        <div class="training-layout">
+          <div>
+            <div class="card mb-20">
+              <div class="card-header">
+                <div class="card-title"><div class="icon icon-blue">📈</div>训练曲线</div>
+                <div class="flex gap-8">
+                  <button class="btn btn-primary btn-sm" id="tr-start-btn" onclick="toggleTraining()">▶ 模拟训练</button>
+                  <select class="input-field btn-sm" id="tr-model-sel" style="padding:6px 14px;min-width:140px">
+                    <option>bilstm-attention</option>
+                    <option>lstm</option>
+                    <option>bigru-self-attention</option>
+                  </select>
+                </div>
+              </div>
+              <div class="epoch-progress">
+                <div class="flex justify-between mb-8">
+                  <span class="text-sm text-secondary">Epoch 进度</span>
+                  <span class="text-sm font-mono" id="tr-progress-label">0 / 10</span>
+                </div>
+                <div class="epoch-bar"><div class="epoch-fill" id="tr-epoch-bar" style="width:0%"></div></div>
+              </div>
+              <div class="training-chart-wrap"><canvas id="training-chart"></canvas></div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><div class="icon icon-green">🖥️</div>训练日志</div>
+                <button class="btn btn-ghost btn-sm" onclick="clearLog()">🗑 清空</button>
+              </div>
+              <div class="training-log" id="training-log">
+                <div class="log-line"><span class="log-prefix">[系统]</span>训练监控就绪，点击"模拟训练"开始</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card mb-16">
+              <div class="card-header"><div class="card-title"><div class="icon icon-purple">⚙️</div>超参数配置</div></div>
+              <div class="input-group">
+                <label class="input-label">Epochs</label>
+                <div class="range-wrap">
+                  <input type="range" class="range-field" min="1" max="50" value="10" id="tr-epochs"
+                    oninput="document.getElementById('tr-epochs-val').textContent=this.value" />
+                  <span class="range-val" id="tr-epochs-val">10</span>
+                </div>
+              </div>
+              <div class="input-group">
+                <label class="input-label">Learning Rate</label>
+                <select class="input-field" id="tr-lr">
+                  <option>0.001</option>
+                  <option selected>0.0005</option>
+                  <option>0.0001</option>
+                  <option>5e-5</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label class="input-label">Batch Size</label>
+                <select class="input-field">
+                  <option>16</option>
+                  <option selected>32</option>
+                  <option>64</option>
+                  <option>128</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label class="input-label">Dropout Rate</label>
+                <div class="range-wrap">
+                  <input type="range" class="range-field" min="0" max="80" value="30" id="tr-dropout"
+                    oninput="document.getElementById('tr-dropout-val').textContent=(this.value/100).toFixed(2)" />
+                  <span class="range-val" id="tr-dropout-val">0.30</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="icon icon-orange">🏆</div>最优模型</div></div>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:var(--accent-tertiary)"></div>
+                  <div class="timeline-time">Epoch 8</div>
+                  <div class="timeline-title">最优验证准确率</div>
+                  <div class="timeline-content"><span style="color:var(--accent-tertiary);font-weight:700">92.8%</span> — EarlyStopping 未触发</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:var(--accent-primary)"></div>
+                  <div class="timeline-time">Epoch 10</div>
+                  <div class="timeline-title">训练完成</div>
+                  <div class="timeline-content">模型已保存至 model/bilstm-attention.h5</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE 14: SETTINGS
+         ============================================================ -->
+    <div class="page" id="page-settings">
+      <div class="page-inner">
+        <div class="page-badge">⚙️ 系统配置</div>
+        <h2 class="section-title">系统配置中心</h2>
+        <p class="section-sub">自定义分析引擎参数、界面偏好及通知规则</p>
+
+        <div class="config-layout">
+          <div class="config-nav">
+            <div class="config-nav-item active" onclick="switchConfig('model')">🤖 模型设置</div>
+            <div class="config-nav-item" onclick="switchConfig('ui')">🎨 界面偏好</div>
+            <div class="config-nav-item" onclick="switchConfig('alert')">🔔 告警规则</div>
+            <div class="config-nav-item" onclick="switchConfig('api-cfg')">🔑 API 配置</div>
+            <div class="config-nav-item" onclick="switchConfig('data-cfg')">🗄️ 数据管理</div>
+          </div>
+
+          <div>
+            <!-- Model Settings -->
+            <div class="config-panel active card" id="config-model">
+              <div class="config-section">
+                <div class="config-section-title">默认模型</div>
+                <div class="input-group">
+                  <label class="input-label">默认分析模型</label>
+                  <select class="input-field">
+                    <option>bilstm-attention（推荐）</option>
+                    <option>lstm</option>
+                    <option>bilstm-self-attention</option>
+                    <option>bigru-self-attention</option>
+                    <option>bert（重型）</option>
+                  </select>
+                </div>
+              </div>
+              <div class="config-section">
+                <div class="config-section-title">推理参数</div>
+                <div class="input-group">
+                  <label class="input-label">最大序列长度</label>
+                  <div class="range-wrap">
+                    <input type="range" class="range-field" min="50" max="512" value="200"
+                      oninput="this.nextElementSibling.textContent=this.value" />
+                    <span class="range-val">200</span>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label class="input-label">置信度阈值（低于此值标记为不确定）</label>
+                  <div class="range-wrap">
+                    <input type="range" class="range-field" min="0" max="99" value="60"
+                      oninput="this.nextElementSibling.textContent=this.value+'%'" />
+                    <span class="range-val">60%</span>
+                  </div>
+                </div>
+                <div class="switch-wrap">
+                  <div class="switch-info"><div class="switch-label">启用 GPU 加速</div><div class="switch-desc">需要 CUDA 支持</div></div>
+                  <label class="switch"><input type="checkbox"><span class="switch-slider"></span></label>
+                </div>
+                <div class="switch-wrap">
+                  <div class="switch-info"><div class="switch-label">模型缓存</div><div class="switch-desc">缓存模型到内存，加快推理速度</div></div>
+                  <label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label>
+                </div>
+              </div>
+              <button class="btn btn-primary mt-16" onclick="showToast('success','配置已保存','模型参数更新成功')">💾 保存配置</button>
+            </div>
+
+            <!-- UI Settings -->
+            <div class="config-panel card" id="config-ui">
+              <div class="config-section">
+                <div class="config-section-title">外观设置</div>
+                <div class="switch-wrap">
+                  <div class="switch-info"><div class="switch-label">背景粒子动画</div><div class="switch-desc">关闭以提升性能</div></div>
+                  <label class="switch"><input type="checkbox" checked id="sw-particles" onchange="toggleParticles()"><span class="switch-slider"></span></label>
+                </div>
+                <div class="switch-wrap">
+                  <div class="switch-info"><div class="switch-label">动画效果</div><div class="switch-desc">页面切换与卡片动画</div></div>
+                  <label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label>
+                </div>
+                <div class="switch-wrap">
+                  <div class="switch-info"><div class="switch-label">数字滚动效果</div><div class="switch-desc">统计数字动态计数</div></div>
+                  <label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label>
+                </div>
+              </div>
+              <div class="config-section">
+                <div class="config-section-title">语言与地区</div>
+                <div class="input-group">
+                  <label class="input-label">界面语言</label>
+                  <select class="input-field"><option>简体中文</option><option>繁體中文</option><option>English</option></select>
+                </div>
+              </div>
+              <button class="btn btn-primary mt-16" onclick="showToast('success','配置已保存','界面偏好更新成功')">💾 保存配置</button>
+            </div>
+
+            <!-- Alert Settings -->
+            <div class="config-panel card" id="config-alert">
+              <div class="config-section">
+                <div class="config-section-title">告警阈值</div>
+                <div class="input-group">
+                  <label class="input-label">负面情感占比告警（超过此比例触发）</label>
+                  <div class="range-wrap">
+                    <input type="range" class="range-field" min="10" max="90" value="40"
+                      oninput="this.nextElementSibling.textContent=this.value+'%'" />
+                    <span class="range-val">40%</span>
+                  </div>
+                </div>
+                <div class="switch-wrap">
+                  <div class="switch-info"><div class="switch-label">浏览器通知</div><div class="switch-desc">触发告警时弹出通知</div></div>
+                  <label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label>
+                </div>
+                <div class="switch-wrap">
+                  <div class="switch-info"><div class="switch-label">声音提示</div></div>
+                  <label class="switch"><input type="checkbox"><span class="switch-slider"></span></label>
+                </div>
+              </div>
+              <button class="btn btn-primary mt-16" onclick="showToast('success','配置已保存','告警规则更新成功')">💾 保存配置</button>
+            </div>
+
+            <!-- API Config -->
+            <div class="config-panel card" id="config-api-cfg">
+              <div class="config-section">
+                <div class="config-section-title">API 服务配置</div>
+                <div class="input-group">
+                  <label class="input-label">服务端口</label>
+                  <input type="number" class="input-field" value="8000" />
+                </div>
+                <div class="input-group">
+                  <label class="input-label">API Key</label>
+                  <input type="password" class="input-field" value="ns_prod_xxxxxxxxxxxxxxxxxxxx" />
+                </div>
+                <div class="switch-wrap">
+                  <div class="switch-info"><div class="switch-label">启用 CORS</div><div class="switch-desc">允许跨域请求</div></div>
+                  <label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label>
+                </div>
+                <div class="switch-wrap">
+                  <div class="switch-info"><div class="switch-label">请求速率限制</div><div class="switch-desc">每分钟最多 100 次请求</div></div>
+                  <label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label>
+                </div>
+              </div>
+              <button class="btn btn-primary mt-16" onclick="showToast('success','配置已保存','API 配置更新成功')">💾 保存配置</button>
+            </div>
+
+            <!-- Data Config -->
+            <div class="config-panel card" id="config-data-cfg">
+              <div class="config-section">
+                <div class="config-section-title">数据存储</div>
+                <div class="switch-wrap">
+                  <div class="switch-info"><div class="switch-label">本地历史记录</div><div class="switch-desc">将分析记录存储到本地 LocalStorage</div></div>
+                  <label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label>
+                </div>
+                <div class="input-group mt-16">
+                  <label class="input-label">最大历史条数</label>
+                  <div class="range-wrap">
+                    <input type="range" class="range-field" min="10" max="1000" value="200"
+                      oninput="this.nextElementSibling.textContent=this.value" />
+                    <span class="range-val">200</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex gap-12 mt-16">
+                <button class="btn btn-primary" onclick="showToast('success','配置已保存')">💾 保存</button>
+                <button class="btn btn-danger btn-sm" onclick="if(confirm('确认清空所有历史记录？')){clearHistory();showToast('success','已清空','历史记录清空完成')}">🗑 清空历史</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE 15: ABOUT
+         ============================================================ -->
+    <div class="page" id="page-about">
+      <div class="page-inner">
+        <div class="about-hero">
+          <div class="page-badge mb-16">💡 关于系统</div>
+          <h1 class="hero-title"><span class="grad">情感智析云平台</span></h1>
+          <p class="hero-sub">基于深度学习的中文三分类情感分析平台<br/>融合多种 NLP 前沿技术架构</p>
+          <div class="flex gap-12 justify-center flex-wrap mt-24">
+            <span class="tag">Python 3.7+</span>
+            <span class="tag tag-green">TensorFlow 2.x</span>
+            <span class="tag tag-purple">PyTorch</span>
+            <span class="tag tag-orange">Transformers</span>
+            <span class="tag">Keras</span>
+            <span class="tag tag-green">BERT</span>
+            <span class="tag tag-purple">BiLSTM</span>
+          </div>
+        </div>
+
+        <div class="section-divider"><span>系统架构</span></div>
+
+        <div class="about-arch mb-32">
+          <div class="arch-layer"><div class="arch-layer-num">UI</div><div class="arch-layer-info"><div class="arch-layer-name">前端界面层</div><div class="arch-layer-desc">HTML5 / CSS3 / JavaScript · 响应式设计 · 实时交互 · 多页签导航与动画反馈，集成模型切换、批量上传、可视化与配置入口</div></div></div>
+          <div class="arch-arrow">↕</div>
+          <div class="arch-layer"><div class="arch-layer-num">API</div><div class="arch-layer-info"><div class="arch-layer-name">RESTful API 层</div><div class="arch-layer-desc">Flask / FastAPI · JSON 数据交换 · 身份认证 · 健康检查、单/批量推理、模型列表接口，支持 CORS 与速率限制</div></div></div>
+          <div class="arch-arrow">↕</div>
+          <div class="arch-layer"><div class="arch-layer-num">ML</div><div class="arch-layer-info"><div class="arch-layer-name">模型推理层</div><div class="arch-layer-desc">LSTM · BiLSTM+Attention · BiGRU+Self-Attention · BERT · 统一推理封装（Keras/PyTorch/ONNX），自动模型回退，支持 GPU/CPU 混合部署</div></div></div>
+          <div class="arch-arrow">↕</div>
+          <div class="arch-layer"><div class="arch-layer-num">DATA</div><div class="arch-layer-info"><div class="arch-layer-name">数据处理层</div><div class="arch-layer-desc">文本预处理 · 词向量嵌入 · 批量数据管道 · 分句/去噪/分词、向量化、长文本分片聚合，支持 CSV/TXT 导入与实时流输入</div></div></div>
+        </div>
+
+        <div class="section-divider"><span>技术栈</span></div>
+
+        <div class="tech-stack mb-32">
+          <div class="tech-badge"><span class="tech-badge-icon">🐍</span>Python</div>
+          <div class="tech-badge"><span class="tech-badge-icon">🧠</span>TensorFlow</div>
+          <div class="tech-badge"><span class="tech-badge-icon">🔥</span>PyTorch</div>
+          <div class="tech-badge"><span class="tech-badge-icon">🤗</span>Transformers</div>
+          <div class="tech-badge"><span class="tech-badge-icon">📊</span>NumPy</div>
+          <div class="tech-badge"><span class="tech-badge-icon">🐼</span>Pandas</div>
+          <div class="tech-badge"><span class="tech-badge-icon">⚡</span>FastAPI</div>
+          <div class="tech-badge"><span class="tech-badge-icon">📈</span>Chart.js</div>
+          <div class="tech-badge"><span class="tech-badge-icon">🔤</span>jieba</div>
+          <div class="tech-badge"><span class="tech-badge-icon">🖥️</span>ONNX</div>
+        </div>
+
+        <div class="section-divider"><span>了解更多</span></div>
+
+        <div class="grid grid-2 gap-16 mb-24">
+          <div class="card">
+            <div class="card-title">平台简介</div>
+            <p class="text-sm text-muted">情感智析云平台是一个统一的情感分析云平台，前后端解耦：后端提供 Flask/REST API 与批量、流式处理接口，前端提供实验室、对比、报告与可视化中心。</p>
+            <p class="text-sm text-muted">特性：多模型热插拔（缺模型文件自动回退 SnowNLP）、三分类预测、批量/实时管道、模型性能对比、历史记录与配置持久化。</p>
+          </div>
+          <div class="card">
+            <div class="card-title">“基于深度学习的细粒度情绪识别”</div>
+            <p class="text-sm text-muted">细粒度意味着不仅判断整段的情感极性，还关注句子/短语级别的情绪强度、语境依赖和主体指向。长文本会被分段分析、聚合；注意力与 BERT 编码捕捉上下文关键信息。</p>
+            <p class="text-sm text-muted">当前工作：清洗并拆分 ChnSentiCorp 等数据；训练 LSTM/BiLSTM/Attention/BiGRU/BERT 多套模型；提供 ONNX 导出脚本；实现 REST 推理接口与可视化前端。</p>
+          </div>
+        </div>
+
+        <div class="section-divider"><span>模型简介</span></div>
+
+        <div class="grid grid-2 gap-16 mb-32">
+          <div class="card">
+            <div class="card-title">LSTM</div>
+            <p class="text-sm text-muted">轻量单向基线，适合低资源或边缘场景；训练快、依赖少，提供稳定的三分类能力。</p>
+          </div>
+          <div class="card">
+            <div class="card-title">BiLSTM + Attention</div>
+            <p class="text-sm text-muted">双向捕捉上下文，注意力聚焦关键情感片段，是默认推荐模型，在长评论与对比实验中表现均衡。</p>
+          </div>
+          <div class="card">
+            <div class="card-title">BiLSTM + Self-Attention</div>
+            <p class="text-sm text-muted">自注意力替代显式注意力头，提升长距离依赖建模能力，减轻人工特征工程需求。</p>
+          </div>
+          <div class="card">
+            <div class="card-title">BiGRU + Self-Attention</div>
+            <p class="text-sm text-muted">参数量更小但捕捉双向语义，与自注意力结合在速度与精度间取得平衡，适合中等规模推理。</p>
+          </div>
+          <div class="card">
+            <div class="card-title">BERT（中文）</div>
+            <p class="text-sm text-muted">基于 bert-base-chinese 微调，适合需要更高精度和上下文理解的场景，可导出 ONNX 以提升部署效率。</p>
+          </div>
+        </div>
+
+        <div class="section-divider"><span>模型参数一览</span></div>
+
+        <div class="grid grid-3 gap-16 mb-32">
+          <div class="card text-center">
+            <div style="font-size:36px;margin-bottom:12px">🔷</div>
+            <div class="card-title justify-center mb-8">LSTM</div>
+            <div class="text-sm text-muted">单向 LSTM + Dense</div>
+            <div class="divider"></div>
+            <div class="font-mono text-xs text-secondary">Embedding: 128维<br/>Hidden: 128<br/>Params: ~3M</div>
+          </div>
+          <div class="card text-center">
+            <div style="font-size:36px;margin-bottom:12px">🔷🔷</div>
+            <div class="card-title justify-center mb-8">BiLSTM + Attention</div>
+            <div class="text-sm text-muted">双向 LSTM + 注意力机制</div>
+            <div class="divider"></div>
+            <div class="font-mono text-xs text-secondary">Embedding: 128维<br/>Hidden: 256×2<br/>Params: ~8M</div>
+          </div>
+          <div class="card text-center">
+            <div style="font-size:36px;margin-bottom:12px">🤖</div>
+            <div class="card-title justify-center mb-8">BERT</div>
+            <div class="text-sm text-muted">bert-base-chinese 微调</div>
+            <div class="divider"></div>
+            <div class="font-mono text-xs text-secondary">Layers: 12<br/>Hidden: 768<br/>Params: ~102M</div>
+          </div>
+        </div>
+
+        <div class="section-divider"><span>版本历史</span></div>
+
+        <div class="timeline mb-32" style="max-width:600px;margin:0 auto">
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:var(--accent-tertiary)"></div>
+            <div class="timeline-time">v2.0 · 2026年2月</div>
+            <div class="timeline-title">引入 BERT + 全新 UI</div>
+            <div class="timeline-content">新增 BERT 微调模型，重构前端界面，支持批量分析</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:var(--accent-primary)"></div>
+            <div class="timeline-time">v1.5 · 2025年10月</div>
+            <div class="timeline-title">BiGRU + Self-Attention</div>
+            <div class="timeline-content">新增 BiGRU 模型，引入 Self-Attention 机制</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#7c3aed"></div>
+            <div class="timeline-time">v1.0 · 2025年6月</div>
+            <div class="timeline-title">初版发布</div>
+            <div class="timeline-content">基于 LSTM / BiLSTM+Attention 的三分类情感分析系统</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#pages -->
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <p>情感智析云平台 v2.0 &nbsp;|&nbsp; 基于 <a href="#">ChnSentiCorp</a> 数据集 &nbsp;|&nbsp; 构建时间：2026-02-18</p>
+  </footer>
+
+</div><!-- /#app -->
+
+<!-- Script files -->
+<script src="js/particles.js"></script>
+<script src="js/analysis.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

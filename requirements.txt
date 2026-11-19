@@ -1,0 +1,15 @@
+Keras==2.6.0
+tensorflow-gpu==2.6.0
+gensim==4.2.0
+jieba==0.38
+sklearn==0.0
+
+# bert
+transformers==4.27.1
+torch==1.13.1
+onnxruntime==1.14.1
+
+# ── 后端 API 服务（必需）──────────────────────────────────────────
+flask>=2.3.0
+flask-cors>=4.0.0
+snownlp>=0.12.3

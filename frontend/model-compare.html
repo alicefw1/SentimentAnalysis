@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>模型对比 - 情感分析</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+    body {
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      min-height: 100vh;
+    }
+    .result-text {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body class="text-slate-800">
+  <main class="max-w-5xl mx-auto px-4 py-8 md:py-12">
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-8">
+      <header class="mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight">模型对比</h1>
+        <p class="text-slate-500 mt-2">输入文本并选择多个模型，快速查看各模型的分析输出。</p>
+      </header>
+
+      <div class="space-y-6">
+        <!-- 输入区域 -->
+        <section>
+          <label for="inputText" class="block text-sm font-medium mb-2">待分析文本</label>
+          <textarea
+            id="inputText"
+            rows="6"
+            class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm md:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            placeholder="请输入需要模型分析的文本内容"
+            aria-describedby="inputHelp"
+          ></textarea>
+          <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm">
+            <p id="inputHelp" class="text-slate-500">最多输入 5000 字符。</p>
+            <p id="charCounter" class="text-slate-500">0 / 5000</p>
+          </div>
+          <p id="inputWarning" class="mt-2 text-sm text-rose-600 hidden"></p>
+        </section>
+
+        <!-- 模型选择区域 -->
+        <section>
+          <p class="text-sm font-medium mb-3">选择对比模型（可多选）</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="modelGroup">
+            <label class="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 hover:border-blue-300 transition cursor-pointer">
+              <input type="checkbox" class="model-checkbox h-4 w-4 accent-blue-600" value="LSTM" />
+              <span class="text-sm">LSTM</span>
+            </label>
+            <label class="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 hover:border-blue-300 transition cursor-pointer">
+            <!-- 报告中心入口已移除 -->
+              <span class="text-sm">BiLSTM-Attention</span>
+            </label>
+            <label class="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 hover:border-blue-300 transition cursor-pointer">
+              <input type="checkbox" class="model-checkbox h-4 w-4 accent-blue-600" value="BiLSTM-SelfAttention" />
+              <span class="text-sm">BiLSTM-SelfAttention</span>
+            </label>
+            <label class="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 hover:border-blue-300 transition cursor-pointer">
+              <input type="checkbox" class="model-checkbox h-4 w-4 accent-blue-600" value="BiGRU-SelfAttention" />
+              <span class="text-sm">BiGRU-SelfAttention</span>
+            </label>
+            <label class="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 hover:border-blue-300 transition cursor-pointer">
+              <input type="checkbox" class="model-checkbox h-4 w-4 accent-blue-600" value="BERT" />
+              <span class="text-sm">BERT</span>
+            </label>
+          </div>
+          <p id="modelWarning" class="mt-2 text-sm text-rose-600 hidden">请至少选择一个模型进行对比。</p>
+        </section>
+
+        <!-- 操作按钮 -->
+        <section class="flex flex-wrap gap-3">
+          <button
+            id="analyzeBtn"
+            class="inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm md:text-base font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed"
+            disabled
+          >
+            开始分析
+          </button>
+          <button
+            id="clearBtn"
+            class="inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm md:text-base font-medium border border-slate-300 text-slate-700 hover:bg-slate-50"
+            type="button"
+          >
+            清空内容
+          </button>
+        </section>
+      </div>
+    </section>
+
+    <!-- 结果展示区域 -->
+    <section id="resultSection" class="mt-6 hidden">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-8">
+        <div class="flex items-center justify-between gap-2 mb-4">
+          <h2 class="text-xl font-semibold">对比结果</h2>
+          <span id="resultCount" class="text-sm text-slate-500"></span>
+        </div>
+        <p id="emptyResult" class="text-slate-500">暂无分析结果，请先输入文本并选择模型后点击开始分析。</p>
+        <div id="resultGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ===== 常量与状态 =====
+    const MAX_LEN = 5000;
+    const inputEl = document.getElementById('inputText');
+    const charCounterEl = document.getElementById('charCounter');
+    const inputWarningEl = document.getElementById('inputWarning');
+    const modelWarningEl = document.getElementById('modelWarning');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const resultSection = document.getElementById('resultSection');
+    const resultGrid = document.getElementById('resultGrid');
+    const emptyResult = document.getElementById('emptyResult');
+    const resultCount = document.getElementById('resultCount');
+    const checkboxes = Array.from(document.querySelectorAll('.model-checkbox'));
+
+    let isLoading = false;
+
+    // 获取选中的模型
+    function getSelectedModels() {
+      return checkboxes.filter((item) => item.checked).map((item) => item.value);
+    }
+
+    function setButtonState() {
+      const hasText = inputEl.value.trim().length > 0;
+      const hasModel = getSelectedModels().length > 0;
+      analyzeBtn.disabled = !hasText || !hasModel || isLoading;
+      analyzeBtn.textContent = isLoading ? '分析中...' : '开始分析';
+    }
+
+    function updateCounterAndLimit() {
+      let current = inputEl.value.length;
+      if (current > MAX_LEN) {
+        inputEl.value = inputEl.value.slice(0, MAX_LEN);
+        current = MAX_LEN;
+        inputWarningEl.textContent = '输入已超过 5000 字符，已自动截断。';
+        inputWarningEl.classList.remove('hidden');
+      } else {
+        inputWarningEl.textContent = '';
+        inputWarningEl.classList.add('hidden');
+      }
+      charCounterEl.textContent = `${current} / ${MAX_LEN}`;
+    }
+
+    function clearWarnings() {
+      modelWarningEl.classList.add('hidden');
+      modelWarningEl.textContent = '请至少选择一个模型进行对比。';
+    }
+
+    // 渲染分析结果
+    function renderResults(resultList) {
+      resultSection.classList.remove('hidden');
+      resultGrid.innerHTML = '';
+
+      if (!resultList.length) {
+        emptyResult.classList.remove('hidden');
+        resultCount.textContent = '';
+        return;
+      }
+
+      emptyResult.classList.add('hidden');
+      resultCount.textContent = `共 ${resultList.length} 个模型`;
+
+      // 只显示主要分析结果
+      resultList.forEach((item) => {
+        const card = document.createElement('article');
+        card.className = 'rounded-xl border border-slate-200 p-4 md:p-5 bg-slate-50/40';
+        card.innerHTML = `
+          <header class="flex items-center justify-between gap-2 mb-3">
+            <h3 class="text-base md:text-lg font-semibold text-slate-900">${item.modelName || item.modelId}</h3>
+            <span class="text-xs md:text-sm text-slate-500">${item.inferenceMs ? `耗时 ${item.inferenceMs} ms` : ''}</span>
+          </header>
+          <div class="flex items-center gap-4 mb-2">
+            <span class="text-lg">${item.emoji || ''}</span>
+            <span class="font-semibold" style="color:${item.color || '#333'}">${item.label || ''}</span>
+            <span class="ml-2 text-sm text-slate-500">置信度 ${(item.confidence * 100).toFixed(1)}%</span>
+          </div>
+          <div class="text-xs text-slate-500 mb-2">正面 ${(item.probabilities?.positive*100).toFixed(1)}% ｜ 中性 ${(item.probabilities?.neutral*100).toFixed(1)}% ｜ 负面 ${(item.probabilities?.negative*100).toFixed(1)}%</div>
+          <div class="flex flex-wrap gap-2 mb-2">
+            ${(item.keywords && item.keywords.length) ? item.keywords.map(k => `<span style="background:rgba(0,0,0,0.04);padding:2px 8px;border-radius:8px;color:${k.type==='positive'?'#06ffa5':k.type==='negative'?'#ff2d55':'#a78bfa'}">${k.word}</span>`).join('') : '<span class="text-slate-400">无关键词</span>'}
+          </div>
+          <div class="text-xs text-slate-400">${item.text ? item.text : ''}</div>
+        `;
+        resultGrid.appendChild(card);
+      });
+    }
+
+    // ===== 事件绑定 =====
+    inputEl.addEventListener('input', () => {
+      updateCounterAndLimit();
+      clearWarnings();
+      setButtonState();
+    });
+
+    checkboxes.forEach((item) => {
+      item.addEventListener('change', () => {
+        clearWarnings();
+        setButtonState();
+      });
+    });
+
+    analyzeBtn.addEventListener('click', async () => {
+      if (isLoading) return;
+
+      const textValue = inputEl.value.trim();
+      const selectedModels = getSelectedModels();
+
+      if (!textValue) {
+        inputWarningEl.textContent = '请输入需要分析的文本内容。';
+        inputWarningEl.classList.remove('hidden');
+        return;
+      }
+
+      if (selectedModels.length === 0) {
+        modelWarningEl.textContent = '请至少选择一个模型进行对比。';
+        modelWarningEl.classList.remove('hidden');
+        return;
+      }
+
+      isLoading = true;
+      setButtonState();
+      renderResults([]);
+      emptyResult.textContent = '正在分析中，请稍候...';
+
+      try {
+        // 并行调用真实 analyzeSentiment
+        const tasks = selectedModels.map((modelName) => {
+          // 兼容模型ID映射
+          let modelId = modelName.toLowerCase().replace(/-/g, '').replace('attention','-attention').replace('selfattention','-self-attention').replace('bigru','bigru-self-attention').replace('bilstm','bilstm').replace('lstm','lstm').replace('bert','bert');
+          if(modelId.includes('bigru') && !modelId.includes('self-attention')) modelId = 'bigru-self-attention';
+          if(modelId.includes('bilstm') && modelId.includes('selfattention')) modelId = 'bilstm-self-attention';
+          if(modelId==='bilstmattention') modelId = 'bilstm-attention';
+          if(modelId==='bilstmself-attention') modelId = 'bilstm-self-attention';
+          if(modelId==='bigru-selfattention') modelId = 'bigru-self-attention';
+          if(modelId==='lstm') modelId = 'lstm';
+          if(modelId==='bert') modelId = 'bert';
+          return window.analyzeSentiment(textValue, modelId).then(r => r || { modelName, error: '无结果' }).catch(() => ({ modelName, error: '分析失败' }));
+        });
+        const resultList = await Promise.all(tasks);
+        renderResults(resultList.filter(r => !r.error));
+        if(resultList.filter(r => !r.error).length === 0) {
+          emptyResult.classList.remove('hidden');
+          emptyResult.textContent = '分析失败，请稍后重试。';
+        }
+      } catch (error) {
+        emptyResult.classList.remove('hidden');
+        emptyResult.textContent = '分析失败，请稍后重试。';
+      } finally {
+        isLoading = false;
+        setButtonState();
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      if (isLoading) return;
+
+      inputEl.value = '';
+      checkboxes.forEach((item) => {
+        item.checked = false;
+      });
+      updateCounterAndLimit();
+      clearWarnings();
+      setButtonState();
+
+      resultSection.classList.add('hidden');
+      resultGrid.innerHTML = '';
+      emptyResult.textContent = '暂无分析结果，请先输入文本并选择模型后点击开始分析。';
+      resultCount.textContent = '';
+    });
+
+    // 初始化页面状态
+    updateCounterAndLimit();
+    setButtonState();
+  </script>
+</body>
+</html>
